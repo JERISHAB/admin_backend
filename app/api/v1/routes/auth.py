@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from app.api.v1.schemas.user import UserCreate, UserResponse
 from app.api.v1.schemas.token import Token
 from app.core.database import get_db
-from app.db.repositories.user import create_user, get_user_by_username, get_user_by_email
+from app.db.repositories.user import create_user, get_user_by_email
 from app.utils.auth import authenticate_user, create_access_token, create_refresh_token, validate_email
 from app.utils.response_utils import ResponseHandler, ResponseModel
 

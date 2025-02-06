@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.v1.routes import auth, router as api_router  # Import your API routes
+from app.api.v1.routes import auth,job, router as api_router  # Import your API routes
 
 # Load environment variables from a .env file
 load_dotenv()
@@ -21,8 +21,9 @@ app.add_middleware(
 
 # Include API routers for different routes (e.g., users, auth)
 app.include_router(auth.router, prefix="/api/v1/users", tags=["Users"])  # Users-related routes
-
+app.include_router(job.router, prefix="/api/v1/jobs", tags=["Jobs"])  # Jobs-related routes
 # Root endpoint for basic health check
+
 @app.get("/")
 def read_root():
     return {"message": "Hello World! The backend server is running and live for API Testing."}
