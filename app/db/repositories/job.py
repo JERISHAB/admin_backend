@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from app.api.v1.schemas.job import JobCreate
 from app.db.models.job import Job
+from app.db.models.user import User
 from uuid import UUID
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -25,7 +26,8 @@ def create_job_db(db: Session, job_data: JobCreate):
                       location = job_data.location,
                       timing = job_data.timing,
                       about = job_data.about,
-                      responsibilities = job_data.responsibilities
+                      responsibilities = job_data.responsibilities,
+                      last_date = job_data.last_date
                       ) # THis line means that we are creating a new Job object with the data passed in the job_data dictionary
         db.add(new_job) 
         db.commit()
@@ -42,6 +44,16 @@ def update_job_db(db: Session, job_id: UUID, job_data: JobCreate):
         return None
     for key, value in job_data.model_dump().items():
         setattr(job, key, value)
+    db.commit()
+    db.refresh(job)
+    return job
+
+# Change the status of a job posting
+def change_job_status_db(db: Session, job_id: UUID, status: str):
+    job = db.query(Job).filter(Job.id == job_id).first()
+    if not job:
+        return None
+    job.status = status
     db.commit()
     db.refresh(job)
     return job

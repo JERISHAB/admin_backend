@@ -8,6 +8,7 @@ class JobBase(BaseModel):
     title: str
     category: str
     experience_required: int
+    last_date: Optional[str]
     status: str
     location: str
     timing: str
@@ -28,6 +29,7 @@ class JobUpdate(JobBase):
     timing: Optional[str]
     about: Optional[str]
     responsibilities: Optional[str]
+    last_date: Optional[datetime]
 
 # Response schema for returning job details
 class JobResponse(JobBase):
@@ -48,7 +50,7 @@ class JobResponse(JobBase):
             return str(value)
         return value
     
-    @field_validator("created_at","updated_at", mode="before")
+    @field_validator("created_at","updated_at","last_date", mode="before")
     def convert_datetime_to_str(cls, value):
         if isinstance(value, datetime):
             return value.strftime("%Y-%m-%d %H:%M:%S")
