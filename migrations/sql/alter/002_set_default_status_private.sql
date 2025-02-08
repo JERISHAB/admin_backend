@@ -1,0 +1,2 @@
+ALTER TABLE jobs 
+ALTER COLUMN status SET DEFAULT 'private';
