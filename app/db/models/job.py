@@ -1,4 +1,4 @@
-from sqlalchemy import UUID, Column, String, Integer, Enum, DateTime, ForeignKey
+from sqlalchemy import UUID, Column, String, Integer, Enum, DateTime, ARRAY
 from sqlalchemy.orm import relationship
 import uuid
 from datetime import datetime,timedelta,timezone
@@ -19,4 +19,4 @@ class Job(Base):
     last_date = Column(DateTime, nullable=True)
     timing = Column(Enum('full-time', 'part-time', 'contract', name='job_timing'), nullable=False)
     about = Column(String, nullable=False)
-    responsibilities = Column(String, nullable=False)
+    responsibilities = Column(ARRAY(String), nullable=True)

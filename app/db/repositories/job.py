@@ -18,7 +18,7 @@ def get_job_by_id(db: Session, job_id: UUID):
 
 # Create a new job posting
 def create_job_db(db: Session, job_data: JobCreate):
-    try:
+    # try:
         new_job = Job(title = job_data.title,
                       category=job_data.category,
                       experience_required = job_data.experience_required,
@@ -33,7 +33,7 @@ def create_job_db(db: Session, job_data: JobCreate):
         db.commit()
         db.refresh(new_job)
         return new_job
-    except SQLAlchemyError:
+    # except SQLAlchemyError:
         db.rollback()
         return None
 
