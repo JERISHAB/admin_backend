@@ -2,6 +2,7 @@ from pydantic import BaseModel,field_validator
 from typing import Optional
 from datetime import datetime
 from uuid import UUID
+from typing import List
 
 # Base class for job-related fields
 class JobBase(BaseModel):
@@ -13,7 +14,7 @@ class JobBase(BaseModel):
     location: str
     timing: str
     about: str
-    responsibilities: str
+    responsibilities: List[str]
 
 # Schema for creating a job post
 class JobCreate(JobBase):
@@ -28,7 +29,7 @@ class JobUpdate(JobBase):
     location: Optional[str]
     timing: Optional[str]
     about: Optional[str]
-    responsibilities: Optional[str]
+    responsibilities: Optional[List[str]]
     last_date: Optional[datetime]
 
 # Response schema for returning job details
