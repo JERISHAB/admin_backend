@@ -35,11 +35,7 @@ def create_member(user:UserCreate, db: Session = Depends(get_db),current_user: U
         return ResponseHandler.error("Email already registered", status_code=400)
 
     # Create the new user and return response
-    created_user = create_user(db=db, user=user)
-    user_response = UserResponse.model_validate(created_user)
-    return ResponseHandler.success(data=user_response, message="User registered successfully")
-
-
+    user_response = create_user(db, user)
     if user_response:
         return ResponseHandler.success(data=UserResponse.model_validate(user_response), message="User created successfully")
     return ResponseHandler.error(message="User not created", status_code=500)
