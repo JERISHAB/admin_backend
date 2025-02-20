@@ -2,7 +2,7 @@ import os
 from datetime import timedelta
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from fastapi import APIRouter, Depends, Form, HTTPException, status
+from fastapi import APIRouter, Depends, Body, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -10,8 +10,9 @@ from app.api.v1.schemas.user import UserCreate, UserResponse
 from app.api.v1.schemas.token import Token
 from app.core.database import get_db
 from app.db.repositories.user import create_user, get_user_by_email
-from app.utils.auth import authenticate_user, create_access_token, create_refresh_token, validate_email
+from app.utils.auth import authenticate_user, create_access_token, create_refresh_token, validate_email, get_current_user
 from app.utils.response_utils import ResponseHandler, ResponseModel
+from app.db.models.user import User
 
 # Environment variables
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -48,7 +49,7 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
 
 # Login and provide access token
 @router.post("/login/", response_model=ResponseModel[Token])
-def login_for_access_token(email: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
+def login_for_access_token(email: str = Body(...), password: str = Body(...), db: Session = Depends(get_db)):
     # Authenticate user
     user = authenticate_user(db, email, password)
     if not user:
@@ -81,6 +82,14 @@ def login_for_access_token(email: str = Form(...), password: str = Form(...), db
 
 class RefreshTokenRequestBody(BaseModel):
     refresh_token: str
+
+
+#Get current user info
+@router.get("/user/", response_model=ResponseModel[UserResponse])
+def get_current_user_info(current_user: User = Depends(get_current_user)):
+    if not current_user:
+        return ResponseHandler.error("User not found", status_code=404)
+    return ResponseHandler.success(data=UserResponse.model_validate(current_user), message="User found")
 
 
 # Refresh access token using refresh token
