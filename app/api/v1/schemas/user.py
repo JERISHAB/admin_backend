@@ -9,6 +9,7 @@ class UserCreate(BaseModel):
 class UserResponse(BaseModel):
     id: int
     email: EmailStr
+    username: str
     role: str
 
     class Config:
