@@ -57,3 +57,7 @@ class JobResponse(JobBase):
             return value.strftime("%Y-%m-%d %H:%M:%S")
         return value
     
+
+#Response model for categories
+class CategoriesResponseModel(BaseModel):
+    categories: List[str]
