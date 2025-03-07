@@ -2,8 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, Form, status
 from sqlalchemy.orm import Session
 from uuid import UUID
 from typing import List
+from app.db.models.job import Job
 from app.db.models.user import User
-from app.api.v1.schemas.job import JobCreate, JobUpdate, JobResponse
+from app.api.v1.schemas.job import JobCreate, JobUpdate, JobResponse, CategoriesResponseModel
 from app.core.database import get_db
 from app.utils.auth import get_current_user
 from app.utils.response_utils import ResponseHandler, ResponseModel
@@ -35,7 +36,28 @@ def create_job(job: JobCreate, db: Session = Depends(get_db),current_user: User 
     if job_response:
         return ResponseHandler.success(data=JobResponse.model_validate(job_response), message="Job created successfully")
     return ResponseHandler.error(message="Job not created", status_code=500)
+
+
+# Get the categories of jobs
+@router.get("/categories/", response_model=CategoriesResponseModel)
+def get_job_categories(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    if not current_user:
+        return ResponseHandler.error(message="User not found", status_code=404)
     
+    if current_user.role not in ["admin", "editor", "viewer"]:
+        return ResponseHandler.error(message="User not authorized", status_code=401)
+    
+    # Query distinct categories from the Job model
+    categories = db.query(Job.category).distinct().all()
+    
+    # Convert list of tuples to a list of strings
+    category_list = [category[0] for category in categories]
+
+    if category_list:
+        return ResponseHandler.success(data=category_list, message="Categories fetched successfully")
+    return ResponseHandler.error(message="No categories found", status_code=404)   
+
+
 
 # Get a single job by ID
 @router.get("/{job_id}/", response_model=ResponseModel[JobResponse])
@@ -74,6 +96,7 @@ def change_job_status(job_id: UUID, status: str, db: Session = Depends(get_db),c
     if job:
         return ResponseHandler.success(data=JobResponse.model_validate(job), message="Job status updated successfully")
     return ResponseHandler.error(message="Job not found", status_code=404)
+
     
 
 # Delete a job by ID
@@ -81,7 +104,7 @@ def change_job_status(job_id: UUID, status: str, db: Session = Depends(get_db),c
 def delete_job(job_id: UUID, db: Session = Depends(get_db),current_user: User = Depends(get_current_user)):
     if not current_user:
         return ResponseHandler.error(message="User not found", status_code=404)
-    if current_user.role not in ["admin"]:
+    if current_user.role not in ["admin","editor"]:
         return ResponseHandler.error(message="User not authorized", status_code=401)
     job_to_delete = delete_job_by_id(db, job_id)
     if job_to_delete:
